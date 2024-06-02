@@ -1,16 +1,12 @@
 import { CartModel } from '@/models/Cart';
-import { ProductModel } from '@/models/Product';
-import { UserModel } from '@/models/User';
 import { formatDate } from 'date-fns';
 import { v4 as uuidv4 } from 'uuid';
-import { products } from './createMockProduts';
+import { UserDto } from '@/dto/UserDto';
+import { ProductDto } from '@/dto/ProductDto';
 import { InvoiceModel } from '@/models/Invoice';
 
-export function generateInvoice(user: UserModel, cart: CartModel): InvoiceModel {
+export function generateInvoice(user: UserDto, cart: CartModel, productsInCart: ProductDto[]): InvoiceModel {
   const currentDate = new Date();
-
-  const productsInCart: ProductModel[] = [];
-  cart.forEach((value, key, map) => { productsInCart.push(products[key]) });
 
   const invoice: InvoiceModel = {
     id: uuidv4(),

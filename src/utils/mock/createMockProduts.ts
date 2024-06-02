@@ -1,4 +1,4 @@
-import { ProductModel } from "@/models/Product";
+import { ProductDto } from "@/dto/ProductDto";
 
 function generateRandomInt(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1));
@@ -43,7 +43,7 @@ const connecs = [
 const prices = [400, 275, 350, 325, 300];
 const cents = [0, 50, 99];
 
-const example: ProductModel = {
+const example: ProductDto = {
   id: 0,
   imageUrl: "https://fakeimg.pl/256x512/767171/",
   name: "nome",
@@ -54,10 +54,12 @@ const example: ProductModel = {
   brand: "asus",
   model: "ABC",
   color: "Preto",
-  connectivity: "com fio"
+  connectivity: "com fio",
+  quantity: 0,
+  isRemoved: false
 }
 
-export const products: ProductModel[] = Array(15).fill(null).map((_, i) => ({
+export const products: ProductDto[] = Array(15).fill(null).map((_, i) => ({
   id: i,
   imageUrl: `${imageBasePath}product_${i}.jpg`,
   name: names[i],
@@ -69,4 +71,6 @@ export const products: ProductModel[] = Array(15).fill(null).map((_, i) => ({
   color: colors[i],
   model: models[i],
   connectivity: connecs[i],
+  quantity: 10,
+  isRemoved: false
 }));

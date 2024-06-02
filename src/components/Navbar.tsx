@@ -1,7 +1,7 @@
 import { Link, NavigateFunction, useNavigate } from 'react-router-dom';
 import logo from "../assets/carrinho.png";
 import { WalletIcon } from 'lucide-react';
-import { UserModel } from '@/models/User';
+import { UserDto } from '@/dto/UserDto';
 import {
   Tooltip,
   TooltipContent,
@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/tooltip";
 import { Button } from './ui/button';
 import { useUser } from '@/hooks/UseUser';
-import toast from 'react-hot-toast';
 import { useState } from 'react';
 
 interface Props {
@@ -30,11 +29,10 @@ function Start(_navigate: NavigateFunction) {
 }
 
 
-function Center(_navigate: NavigateFunction, children: React.ReactNode, user: UserModel, addFunds: (ammount: number) => void) {
+function Center(_navigate: NavigateFunction, children: React.ReactNode, user: UserDto, addFunds: (ammount: number) => void) {
   const [ dummyState, forceUpdate ] = useState(0);
 
   function handleWalletClick() {
-    toast("Fundos adicionados");
     addFunds(500);
     forceUpdate(dummyState === 0 ? 1 : 0);
   }
@@ -43,11 +41,11 @@ function Center(_navigate: NavigateFunction, children: React.ReactNode, user: Us
     <div className="justify-center">
       <div className="flex flex-row items-center sm:space-x-2 text-green-100">
         {children}
-        <TooltipProvider>
-          <Button variant="link" onClick={() => {handleWalletClick()}}>
+        <TooltipProvider delayDuration={0.7}>
+          <Button variant="ghost" className="cursor-pointer" onClick={() => {handleWalletClick()}}>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="ghost"><WalletIcon></WalletIcon></Button>
+                  <WalletIcon className="stroke-black"></WalletIcon>
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>{user.currency} {user.balance.toFixed(2)}</p>

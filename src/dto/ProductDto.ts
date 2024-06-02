@@ -1,4 +1,4 @@
-export interface ProductModel {
+export interface ProductDto {
   id: productId;
   imageUrl: string;
   name: string;
@@ -10,6 +10,8 @@ export interface ProductModel {
   model: string;
   color: string;
   connectivity: string;
+  quantity: number;
+  isRemoved: boolean;
 };
 
 export type productId = number;

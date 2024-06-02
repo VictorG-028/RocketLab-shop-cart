@@ -1,5 +1,6 @@
 import { InvoiceModel } from "@/models/Invoice";
 import { Separator } from "@radix-ui/react-separator";
+import { Address } from "@/models/Adress";
 
 interface Props {
   data: InvoiceModel;
@@ -12,6 +13,7 @@ interface Props {
 export default function Invoice({data, children, totalPrice, userFreezedBalance}: Props) {
 
   const currency = data.billTo.currency;
+  const firstAddress: Address | undefined = data.billTo.addresses.length > 0 ? data.billTo.addresses[0] : undefined;
   const oldBalance = userFreezedBalance.toFixed(2);
   const newBalance = (userFreezedBalance - totalPrice).toFixed(2);
   const delta = `${currency}${oldBalance} / ${currency}${newBalance}`;
@@ -36,8 +38,8 @@ export default function Invoice({data, children, totalPrice, userFreezedBalance}
         <div>     
           <h2 className="text-lg font-bold mb-4">Fatura para:</h2>
           <div className="text-gray-700 mb-2">{data.billTo.name}</div>
-          <div className="text-gray-700 mb-2">{data.billTo.address.number} {data.billTo.address.street}</div>
-          <div className="text-gray-700 mb-2">{data.billTo.address.city}, {data.billTo.address.state} {data.billTo.address.zipCode}</div>
+          <div className="text-gray-700 mb-2">{firstAddress?.number} {firstAddress?.street}</div>
+          <div className="text-gray-700 mb-2">{firstAddress?.city}, {firstAddress?.state} {firstAddress?.zipCode}</div>
           <div className="text-gray-700">{data.billTo.email}</div>
         </div>
         <div>

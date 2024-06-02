@@ -1,4 +1,4 @@
-import { productId, quantity } from "./Product";
+import { productId, quantity } from "../dto/ProductDto";
 
 export type CartModel = Map<productId, quantity>;
 

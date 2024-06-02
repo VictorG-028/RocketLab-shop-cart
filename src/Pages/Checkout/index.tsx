@@ -2,37 +2,50 @@ import Invoice from "@/components/Invoice";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/hooks/UseCart";
-import { useOrder } from "@/hooks/UseOrder";
 import { useUser } from "@/hooks/UseUser";
 import { generateInvoice } from "@/utils/createInvoiceDetails";
-import { exampleUser } from "@/utils/createMockUser";
-import React from "react";
 import { useState } from "react";
 import toast from "react-hot-toast";
-import checkmark from "../../assets/checkmark.svg";
+import axios, { AxiosError } from "axios";
+import { ErrorResponseDto } from "@/dto/ErrorResponseDto";
+import { ProductDto } from "@/dto/ProductDto";
+import { useLocation } from "react-router-dom";
 
 export default function Checkout() {
-  const [ finished, setSFinished ] = useState(false);
-  const { cart, updateCart } = useCart();
   const { user } = useUser();
-  const { addOrder } = useOrder();
-  const { subtractFunds } = useUser();
-  const [userBalance, setUserBalance] = useState(user.balance); // To use in the freezed invoice HTML
-  const [invoiceData, setInvoiceData] = useState(generateInvoice(exampleUser, cart));
+  const { cart, updateCart } = useCart();
+  const location = useLocation();
+  const { chosenProducts } = location.state as { chosenProducts: ProductDto[] };
+  const [finished, setFinished] = useState(false);
+  const [ error, setError ] = useState("");
+  const [ userBalance, setUserBalance ] = useState(user.balance); // To use in the freezed invoice HTML
+  const [ invoiceData, setInvoiceData ] = useState(generateInvoice(user, cart, chosenProducts));
 
   const pricesWithQuantity = invoiceData.prices.map((price, i) => price * invoiceData.quantity[i]);
   const totalPrice = pricesWithQuantity.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
 
-  const childRef = React.createRef<typeof Navbar>();
-
   function handleBuyButton() {
     if (user.balance >= totalPrice) {
-      toast.success("Compra efetuada");
-      addOrder(invoiceData);
-      subtractFunds(totalPrice);
-      setSFinished(true);
-      cart.clear();
-      updateCart(cart);
+      const body = {
+        userId: user.id,
+        products: Array.from(cart.entries()).map(([id, quantity]) => ({id, quantity})),
+        cost: totalPrice,
+      };
+      axios.post("http://localhost:3000/order", body).then( _ => {
+        toast.success("Compra efetuada");
+        cart.clear();
+        updateCart(cart);
+        setFinished(true);
+      }).catch((e) => {
+        console.log(e);
+        const axiosError = e as AxiosError<ErrorResponseDto>;
+        const data = axiosError.response?.data;
+        if (data) {
+          toast.error(data.message);
+        } else {
+          toast.error("Erro na hora da compra");
+        }
+      });
     } else {
       toast.error("Fundos insuficientes");
     }
@@ -41,7 +54,7 @@ export default function Checkout() {
   return (
     <main className="min-w-[450px] bg-gray-50 min-h-screen">
       <section>
-        <Navbar routeName="checkout" ref={childRef}></Navbar>
+        <Navbar routeName="checkout"></Navbar>
       </section>
 
       <section className="mb-32">

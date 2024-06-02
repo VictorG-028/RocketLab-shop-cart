@@ -1,9 +1,9 @@
-import { UserModel } from "./User";
+import { UserDto } from "../dto/UserDto";
 
 export interface InvoiceModel {
   id: string;
   currentDate: string;
-  billTo: UserModel;
+  billTo: UserDto;
 
   names: string[];
   quantity: number[];

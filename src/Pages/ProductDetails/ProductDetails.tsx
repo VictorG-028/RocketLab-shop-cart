@@ -1,25 +1,44 @@
-import React, { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { products } from '@/utils/createMockProduts';
-import { ProductModel } from 'src/models/Product';
+import { ProductDto } from 'src/dto/ProductDto';
 import Navbar from '@/components/Navbar';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@radix-ui/react-separator';
+import axios, { AxiosError } from 'axios';
+import { ErrorResponseDto } from '@/dto/ErrorResponseDto';
+import toast from 'react-hot-toast';
 
 export default function ProductDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [product] = useState<ProductModel>(products[parseInt(id || "0")]);
+  const [ product, setProduct ] = useState<ProductDto | null>(null);
+
+  useEffect(() => {
+    axios.get(`http://localhost:3000/product/${id}`).then((res) => {
+      const product = res.data as ProductDto;
+      setProduct(product);
+    }).catch((e) => {
+      const axiosError = e as AxiosError<ErrorResponseDto>;
+      const data = axiosError.response?.data;
+      if (data) {
+        toast.error(data.message);
+      } else {
+        toast.error("Ocorreu algum erro no servidor"); 
+      }
+    });
+  }, []);
 
   return (
     <main className="min-w-[450px] bg-gray-50 min-h-screen">
+      {product && (
+      <>
       <section>
         <Navbar routeName={`product/${product.id}`}>
           <>
             <Button 
               onClick={() => navigate('/')}
               className="text-secondary hover:text-primary-dark"
-            >
+              >
               &larr; Voltar
             </Button>
           </>
@@ -34,7 +53,7 @@ export default function ProductDetails() {
               src={"../" + product.imageUrl} 
               alt="Imagem do Produto" 
               className="max-w-full h-80 rounded-lg shadow-md"
-            />
+              />
           </div>
         
           <div className="md:w-1/2 flex flex-col gap-4">
@@ -65,6 +84,8 @@ export default function ProductDetails() {
         </div>
 
       </section>
+      </>
+      )}
     </main>
   );
 }
