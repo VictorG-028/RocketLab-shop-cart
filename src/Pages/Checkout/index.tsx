@@ -10,7 +10,7 @@ import axios, { AxiosError } from "axios";
 import { ErrorResponseDto } from "@/dto/ErrorResponseDto";
 
 export default function Checkout() {
-  const { user } = useUser();
+  const { user, updateBalance } = useUser();
   const { cart, updateCart } = useCart();
   const [finished, setFinished] = useState(false);
   const [ error, setError ] = useState("");
@@ -32,6 +32,7 @@ export default function Checkout() {
         toast.success("Compra efetuada");
         cart.clear();
         updateCart(cart);
+        updateBalance(null);
         setFinished(true);
       }).catch((e) => {
         console.log(e);
