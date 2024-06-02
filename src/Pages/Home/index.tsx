@@ -83,7 +83,14 @@ export default function Home() {
       isInside = false;
     } else {
       toast.success("Adicionado no carrinho");
-      cart.set(product.id, 1);
+      cart.set(
+        product.id, 
+        {
+          quantity: 1, 
+          name: product.name, 
+          price: product.price
+        }
+      );
       isInside = true;
     }
     updateCart(cart);
@@ -97,12 +104,24 @@ export default function Home() {
     setQuantity: React.Dispatch<React.SetStateAction<number>>
   ) {
     e.stopPropagation();
-    const prevQuantity = (cart.get(product.id) || 0);
-    const newQuantity = Math.max(prevQuantity + (shouldIncrement ? +1 : -1), 1);
-
-    cart.set(product.id, newQuantity);
-    updateCart(cart)
-    setQuantity(newQuantity);
+    const productInfo = cart.get(product.id);
+    if (productInfo) {
+      const prevQuantity =  productInfo.quantity;
+      const newQuantity = Math.max(prevQuantity + (shouldIncrement ? +1 : -1), 1);
+  
+      cart.set(product.id, {...productInfo, quantity: newQuantity});
+      updateCart(cart)
+      setQuantity(newQuantity);
+    } else {
+      cart.set(
+        product.id, 
+        {
+          name: product.name, 
+          price: product.price, 
+          quantity: 1
+        }
+      );
+    }
   }
 
   const filteredProducts = products.filter((product) => {
@@ -133,11 +152,7 @@ export default function Home() {
       toast("O carrinho está vazio");
       return;
     }
-    const chosenProducts = Array.from(cart.entries()).map(([id, quantity]) => {
-      const product = products.find((product) => product.id === id);
-      return { product, quantity };
-    });
-    navigate("/checkout", { state: { chosenProducts } });
+    navigate("/checkout");
   }
 
   return (
@@ -204,7 +219,7 @@ export default function Home() {
               <div key={i}>
                 <Product product={product} 
                   initInsideCart={cart.has(product.id)} 
-                  initProductQuantity={cart.has(product.id) ? cart.get(product.id) : 1} 
+                  initProductQuantity={cart.get(product.id)?.quantity} 
                   cartButtonAction={toggleAddToCart}
                   handleUpdateQuantiy={updateQuantity}
                 >

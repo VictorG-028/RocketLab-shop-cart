@@ -1,7 +1,13 @@
-import { productId, quantity } from "../dto/ProductDto";
+import { productId } from "../dto/ProductDto";
 
-export type CartModel = Map<productId, quantity>;
+export interface ProductInfo {
+  quantity: number;
+  name: string;
+  price: number;
+}
+
+export type CartModel = Map<productId, ProductInfo>;
 
 export function newCartModel(): CartModel {
-  return new Map<productId, quantity>();
+  return new Map<productId, ProductInfo>();
 }

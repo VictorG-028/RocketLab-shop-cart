@@ -8,27 +8,24 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import axios, { AxiosError } from "axios";
 import { ErrorResponseDto } from "@/dto/ErrorResponseDto";
-import { ProductDto } from "@/dto/ProductDto";
-import { useLocation } from "react-router-dom";
 
 export default function Checkout() {
   const { user } = useUser();
   const { cart, updateCart } = useCart();
-  const location = useLocation();
-  const { chosenProducts } = location.state as { chosenProducts: ProductDto[] };
   const [finished, setFinished] = useState(false);
   const [ error, setError ] = useState("");
   const [ userBalance, setUserBalance ] = useState(user.balance); // To use in the freezed invoice HTML
-  const [ invoiceData, setInvoiceData ] = useState(generateInvoice(user, cart, chosenProducts));
+  const [ invoiceData, setInvoiceData ] = useState(generateInvoice(user, cart));
 
   const pricesWithQuantity = invoiceData.prices.map((price, i) => price * invoiceData.quantity[i]);
   const totalPrice = pricesWithQuantity.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
 
   function handleBuyButton() {
     if (user.balance >= totalPrice) {
+      const chosenProducts = Array.from(cart.entries());
       const body = {
         userId: user.id,
-        products: Array.from(cart.entries()).map(([id, quantity]) => ({id, quantity})),
+        products: chosenProducts.map(([id, info]) => ({id, quantity: info.quantity})),
         cost: totalPrice,
       };
       axios.post("http://localhost:3000/order", body).then( _ => {
@@ -40,7 +37,7 @@ export default function Checkout() {
         console.log(e);
         const axiosError = e as AxiosError<ErrorResponseDto>;
         const data = axiosError.response?.data;
-        if (data) {
+        if (data && data.statusCode == 412) {
           toast.error(data.message);
         } else {
           toast.error("Erro na hora da compra");

@@ -3,17 +3,17 @@ import { BadgeInfoIcon, MinusCircleIcon,
   PlusCircleIcon, PlusIcon, ShoppingCartIcon 
 } from "lucide-react";
 import { Separator } from "./ui/separator";
-import { ProductModel } from "src/models/Product";
+import { ProductDto } from "src/dto/ProductDto";
 import { Button } from "./ui/button";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 interface Props {
-  product: ProductModel;
+  product: ProductDto;
   initInsideCart: boolean;
   initProductQuantity?: number;
-  cartButtonAction: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, product: ProductModel, setIsInsideCart: React.Dispatch<React.SetStateAction<boolean>>, setQuantity: React.Dispatch<React.SetStateAction<number>>) => void;
-  handleUpdateQuantiy: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, product: ProductModel, shouldIncrement: boolean, setQuantity: React.Dispatch<React.SetStateAction<number>>) => void;
+  cartButtonAction: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, product: ProductDto, setIsInsideCart: React.Dispatch<React.SetStateAction<boolean>>, setQuantity: React.Dispatch<React.SetStateAction<number>>) => void;
+  handleUpdateQuantiy: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, product: ProductDto, shouldIncrement: boolean, setQuantity: React.Dispatch<React.SetStateAction<number>>) => void;
 }
 
 function ProductImage(url: string) {
